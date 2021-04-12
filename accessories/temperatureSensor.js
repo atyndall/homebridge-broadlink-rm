@@ -9,7 +9,7 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
 
   constructor(log, config = {}, serviceManagerType) {
     super(log, config, serviceManagerType);
-
+    log('started')
     this.temperatureCallbackQueue = {};
     this.monitorTemperature();
   }
