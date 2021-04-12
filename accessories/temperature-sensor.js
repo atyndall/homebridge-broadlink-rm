@@ -1,5 +1,3 @@
-const uuid = require('uuid');
-
 const delayForDuration = require('../helpers/delayForDuration');
 const ServiceManagerTypes = require('../helpers/serviceManagerTypes');
 const { getDevice } = require('../helpers/getDevice');
@@ -11,7 +9,6 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
 
   constructor(log, config = {}) {
     super(log, config);
-    this.temperatureCallbackQueue = {};
     this.monitorTemperature();
   }
 
@@ -45,60 +42,12 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
     device.on('temperature', this.onTemperature.bind(this));
     device.checkTemperature();
 
-    this.updateTemperatureUI();
-    if (!config.isUnitTest) setInterval(this.updateTemperatureUI.bind(this), temperatureUpdateFrequency * 1000)
+    setInterval(this.monitorTemperature.bind(this), temperatureUpdateFrequency * 1000)
   }
 
   onTemperature(temperature) {
     this.state.currentTemperature = temperature;
-    this.processQueuedTemperatureCallbacks(temperature);
-  }
-
-  addTemperatureCallbackToQueue(callback) {
-    const { host, log, name, state } = this;
-
-    // Clear the previous callback
-    if (Object.keys(this.temperatureCallbackQueue).length > 1) {
-      if (state.currentTemperature) {
-        log(`${name} addTemperatureCallbackToQueue (clearing previous callback, using existing temperature)`);
-
-        this.processQueuedTemperatureCallbacks(state.currentTemperature);
-      }
-    }
-
-    // Add a new callback
-    const callbackIdentifier = uuid.v4();
-    this.temperatureCallbackQueue[callbackIdentifier] = callback;
-
-    // Read temperature from Broadlink RM device
-    // If the device is no longer available, use previous tempeature 
-    const device = getDevice({ host, log });
-
-    if (!device || device.state === 'inactive') {
-      if (device && device.state === 'inactive') {
-        log(`${name} addTemperatureCallbackToQueue (device no longer active, using existing temperature)`);
-      }
-
-      this.processQueuedTemperatureCallbacks(state.currentTemperature || 0);
-
-      return;
-    }
-
-    device.checkTemperature();
-    log(`${name} addTemperatureCallbackToQueue (requested temperature from device, waiting)`);
-  }
-
-  processQueuedTemperatureCallbacks(temperature) {
-    if (Object.keys(this.temperatureCallbackQueue).length === 0) return;
-
-    Object.keys(this.temperatureCallbackQueue).forEach((callbackIdentifier) => {
-      const callback = this.temperatureCallbackQueue[callbackIdentifier];
-
-      callback(null, temperature);
-      delete this.temperatureCallbackQueue[callbackIdentifier];
-    })
-
-    this.temperatureCallbackQueue = {};
+    this.updateTemperatureUI();
   }
 
   updateTemperatureUI() {
@@ -108,7 +57,7 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
   }
 
   getCurrentTemperature(callback) {
-    this.addTemperatureCallbackToQueue(callback);
+    callback(this.state.currentTemperature)
   }
 
   // Service Manager Setup
