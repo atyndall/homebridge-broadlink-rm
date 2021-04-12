@@ -139,7 +139,7 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
   // Service Manager Setup
 
   setupServiceManager() {
-    const { config, name, serviceManagerType } = this;
+    const { config, name, serviceManagerType, log } = this;
 
     log('running setup')
 
