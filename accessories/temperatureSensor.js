@@ -23,12 +23,6 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
     config.temperatureAdjustment = config.temperatureAdjustment || 0;
   }
 
-  reset() {
-    super.reset();
-
-    this.state.isRunningAutomatically = false;
-
-  }
   // Device Temperature Methods
 
   async monitorTemperature() {
@@ -38,6 +32,8 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
 
     // Try again in a second if we don't have a device yet
     if (!device) {
+      log(`${name} don't have device yet`)
+
       await delayForDuration(1);
 
       this.monitorTemperature();
@@ -116,8 +112,6 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
     })
 
     this.temperatureCallbackQueue = {};
-
-    this.checkTemperatureForAutoOnOff(temperature);
   }
 
   updateTemperatureUI() {
@@ -148,12 +142,9 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
 
     this.serviceManager = new ServiceManagerTypes[serviceManagerType](name, Service.TemperatureSensor, this.log);
 
-    this.serviceManager.addGetCharacteristic({
-      name: 'currentTemperature',
-      type: Characteristic.CurrentTemperature,
-      method: this.getCurrentTemperature,
-      bind: this
-    })
+    this.serviceManager
+      .getCharacteristic(Characteristic.CurrentTemperature)
+      .onGet(this.getCurrentTemperature.bind(this));
   }
 }
 
