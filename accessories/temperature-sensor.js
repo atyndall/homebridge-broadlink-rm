@@ -1,9 +1,5 @@
-const { assert } = require('chai');
-const uuid = require('uuid');
-const fs = require('fs');
-const findKey = require('find-key');
-
 const delayForDuration = require('../helpers/delayForDuration');
+const ServiceManagerTypes = require('../helpers/serviceManagerTypes');
 const { getDevice } = require('../helpers/getDevice');
 const BroadlinkRMAccessory = require('./accessory');
 
@@ -18,7 +14,7 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
   }
 
   setDefaults() {
-    const { config, state } = this;
+    const { config } = this;
 
     config.temperatureUpdateFrequency = config.temperatureUpdateFrequency || 10;
   }
@@ -26,7 +22,7 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
   // Device Temperature Methods
 
   async monitorTemperature() {
-    const { config, host, log, name, state } = this;
+    const { config, host, log, name } = this;
 
     // Ensure a minimum of a 60 seconds update frequency 
     const temperatureUpdateFrequency = Math.max(60, config.temperatureUpdateFrequency);
