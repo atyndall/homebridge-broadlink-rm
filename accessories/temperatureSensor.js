@@ -9,7 +9,8 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
 
   constructor(log, config = {}, serviceManagerType) {
     super(log, config, serviceManagerType);
-    log('started')
+    log('constructor')
+
     this.temperatureCallbackQueue = {};
     this.monitorTemperature();
   }
@@ -32,7 +33,7 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
 
     // Try again in a second if we don't have a device yet
     if (!device) {
-      log(`${name} don't have device yet`)
+      log(`${name} don't have device`)
 
       await delayForDuration(1);
 
@@ -140,11 +141,16 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
   setupServiceManager() {
     const { config, name, serviceManagerType } = this;
 
+    log('running setup')
+
     this.serviceManager = new ServiceManagerTypes[serviceManagerType](name, Service.TemperatureSensor, this.log);
 
-    this.serviceManager
-      .getCharacteristic(Characteristic.CurrentTemperature)
-      .onGet(this.getCurrentTemperature.bind(this));
+    this.serviceManager.addGetCharacteristic({
+      name: 'currentTemperature',
+      type: Characteristic.CurrentTemperature,
+      method: this.getCurrentTemperature,
+      bind: this
+    })
   }
 }
 
