@@ -81,8 +81,12 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
 
   // Service Manager Setup
 
-  configureServiceManager(serviceManager) {
-    serviceManager.addGetCharacteristic({
+  setupServiceManager() {
+    const { name, serviceManagerType } = this;
+
+    this.serviceManager = new ServiceManagerTypes[serviceManagerType](name, Service.TemperatureSensor, this.log);
+
+    this.serviceManager.addGetCharacteristic({
       name: 'currentTemperature',
       type: Characteristic.CurrentTemperature,
       method: this.getCurrentTemperature,
