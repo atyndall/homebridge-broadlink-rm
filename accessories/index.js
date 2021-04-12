@@ -10,7 +10,7 @@ const GarageDoorOpener = require('./garageDoorOpener');
 const Lock = require('./lock');
 const Light = require('./light');
 const WindowCovering = require('./windowCovering');
-const TemperatureSensor = require('./temperature-sensor');
+const TemperatureSensor = require('./temperatureSensor');
 
 module.exports = {
   AirCon,
