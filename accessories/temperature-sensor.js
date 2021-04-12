@@ -7,8 +7,8 @@ class TemperatureSensorAccessory extends BroadlinkRMAccessory {
 
   serviceType() { return Service.TemperatureSensor }
 
-  constructor(log, config = {}) {
-    super(log, config);
+  constructor(log, config = {}, serviceManagerType) {
+    super(log, config, serviceManagerType);
     this.monitorTemperature();
   }
 
